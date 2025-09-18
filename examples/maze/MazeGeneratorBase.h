@@ -6,31 +6,6 @@
 
 class World;
 
-enum class Direction {
-  NORTH,
-  EAST,
-  SOUTH,
-  WEST
-};
-
-struct maze {
-  size_t rows, cols;
-  std::vector<bool> horizontals, verticals;
-
-  bool GetWall(size_t x, size_t y, Direction dir) { //linearized
-    switch (dir) {
-      case Direction::NORTH:
-        return horizontals[y*cols + x];
-      case Direction::EAST:
-        return verticals[y*cols + (x+1)];
-      case Direction::SOUTH:
-        return horizontals[(y+1)*cols + x];
-      case Direction::WEST:
-        return verticals[y*cols + x];
-    }
-  }
-};
-
 class MazeGeneratorBase {
 public:
   MazeGeneratorBase() = default;

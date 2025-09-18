@@ -4,6 +4,22 @@
 #include <climits>
 bool RecursiveBacktrackerExample::Step(World* w) {
   // todo: implement this
+  if (stack.empty())
+    stack.push_back(randomStartPoint(w));
+
+  std::vector<Point2D> visitables = getVisitables(w, stack.back());
+
+  if (!visitables.empty()) {
+    int randomVisitable = rand() % visitables.size();
+
+    //stack.back.
+    //check if equal to up, down, etc.
+    //Figure out how to delete wall (SetNorth(false))
+    //go to visitable and do opposite
+
+    stack.push_back(visitables[randomVisitable]);
+  }
+
   return false;
 }
 
@@ -33,7 +49,20 @@ std::vector<Point2D> RecursiveBacktrackerExample::getVisitables(World* w, const 
   auto sideOver2 = w->GetSize() / 2;
   std::vector<Point2D> visitables;
 
+  Point2D up = p.Up();
+  Point2D right = p.Right();
+  Point2D down = p.Down();
+  Point2D left = p.Left();
+
   // todo: implement this
+  if (p.x > 0 && !visited[left.x][left.y])
+    visitables.push_back(left);
+  if (p.y < w->GetSize() - 1 && !visited[down.x][down.y])
+    visitables.push_back(down);
+  if (p.x < w->GetSize() - 1 && !visited[right.x][right.y])
+    visitables.push_back(right);
+  if (p.y > 0 && !visited[up.x][up.y])
+    visitables.push_back(up);
 
   return visitables;
 }
