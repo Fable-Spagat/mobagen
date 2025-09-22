@@ -4,20 +4,53 @@
 #include <climits>
 bool RecursiveBacktrackerExample::Step(World* w) {
   // todo: implement this
-  if (stack.empty())
+  if (stack.empty()) {
     stack.push_back(randomStartPoint(w));
+    w->SetNodeColor(stack.back(), Color::Red);
 
-  std::vector<Point2D> visitables = getVisitables(w, stack.back());
+    if (!getVisitables(w, stack.back()).empty())
+      return true;
+  }
+  else {
+    visited[stack.back().x][stack.back().y] = true;
 
-  if (!visitables.empty()) {
-    int randomVisitable = rand() % visitables.size();
+    std::vector<Point2D> visitables = getVisitables(w, stack.back());
 
-    //stack.back.
-    //check if equal to up, down, etc.
-    //Figure out how to delete wall (SetNorth(false))
-    //go to visitable and do opposite
+    if (!visitables.empty()) {
+      int randomVisitable = rand() % visitables.size();
 
-    stack.push_back(visitables[randomVisitable]);
+      if (visitables[randomVisitable] == stack.back().Left()) {
+        w->SetWest(stack.back(), false);
+
+        w->SetEast(visitables[randomVisitable], false);
+      }
+      else if (visitables[randomVisitable] == stack.back().Up()) {
+        w->SetNorth(stack.back(), false);
+
+        w->SetSouth(visitables[randomVisitable], false);
+      }
+      else if (visitables[randomVisitable] == stack.back().Right()) {
+        w->SetEast(stack.back(), false);
+
+        w->SetWest(visitables[randomVisitable], false);
+      }
+      else {
+        w->SetSouth(stack.back(), false);
+
+        w->SetNorth(visitables[randomVisitable], false);
+      }
+
+      stack.push_back(visitables[randomVisitable]);
+
+      visited[stack.back().x][stack.back().y] = true;
+      w->SetNodeColor(stack.back(), Color::Red);
+
+      return true;
+    }
+
+    w->SetNodeColor(stack.back(), Color::Black);
+    stack.pop_back();
+    return true;
   }
 
   return false;
@@ -55,14 +88,21 @@ std::vector<Point2D> RecursiveBacktrackerExample::getVisitables(World* w, const 
   Point2D left = p.Left();
 
   // todo: implement this
-  if (p.x > 0 && !visited[left.x][left.y])
-    visitables.push_back(left);
-  if (p.y < w->GetSize() - 1 && !visited[down.x][down.y])
-    visitables.push_back(down);
-  if (p.x < w->GetSize() - 1 && !visited[right.x][right.y])
-    visitables.push_back(right);
-  if (p.y > 0 && !visited[up.x][up.y])
-    visitables.push_back(up);
+  if (p.x >= -sideOver2)
+    if (!visited[left.x][left.y])
+      visitables.push_back(left);
+
+  if (p.y <= sideOver2)
+    if (!visited[down.x][down.y])
+      visitables.push_back(down);
+
+  if (p.x <= sideOver2)
+    if (!visited[right.x][right.y])
+      visitables.push_back(right);
+
+  if (p.y >= -sideOver2)
+    if (!visited[up.x][up.y])
+      visitables.push_back(up);
 
   return visitables;
 }
