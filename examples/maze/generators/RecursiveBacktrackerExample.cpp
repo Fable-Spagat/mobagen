@@ -88,19 +88,19 @@ std::vector<Point2D> RecursiveBacktrackerExample::getVisitables(World* w, const 
   Point2D left = p.Left();
 
   // todo: implement this
-  if (p.x >= -sideOver2)
+  if (p.x > -sideOver2)
     if (!visited[left.x][left.y])
       visitables.push_back(left);
 
-  if (p.y <= sideOver2)
+  if (p.y < sideOver2)
     if (!visited[down.x][down.y])
       visitables.push_back(down);
 
-  if (p.x <= sideOver2)
+  if (p.x < sideOver2)
     if (!visited[right.x][right.y])
       visitables.push_back(right);
 
-  if (p.y >= -sideOver2)
+  if (p.y > -sideOver2)
     if (!visited[up.x][up.y])
       visitables.push_back(up);
 
