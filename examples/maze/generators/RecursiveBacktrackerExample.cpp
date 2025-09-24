@@ -6,14 +6,20 @@ bool RecursiveBacktrackerExample::Step(World* w) {
   // todo: implement this
   if (stack.empty()) {
     stack.push_back(randomStartPoint(w));
-    w->SetNodeColor(stack.back(), Color::Red);
 
-    if (!getVisitables(w, stack.back()).empty())
+    auto sideOver2 = w->GetSize() / 2;//Brute force fix
+    if (stack.back().x >= sideOver2 || stack.back().y >= sideOver2) {
+      return false;
+    }
+
+    if (!getVisitables(w, stack.back()).empty()) {
+      visited[stack.back().x][stack.back().y] = true;
+      w->SetNodeColor(stack.back(), Color::Red);
+
       return true;
+    }
   }
   else {
-    visited[stack.back().x][stack.back().y] = true;
-
     std::vector<Point2D> visitables = getVisitables(w, stack.back());
 
     if (!visitables.empty()) {
@@ -21,23 +27,15 @@ bool RecursiveBacktrackerExample::Step(World* w) {
 
       if (visitables[randomVisitable] == stack.back().Left()) {
         w->SetWest(stack.back(), false);
-
-        w->SetEast(visitables[randomVisitable], false);
       }
       else if (visitables[randomVisitable] == stack.back().Up()) {
         w->SetNorth(stack.back(), false);
-
-        w->SetSouth(visitables[randomVisitable], false);
       }
       else if (visitables[randomVisitable] == stack.back().Right()) {
         w->SetEast(stack.back(), false);
-
-        w->SetWest(visitables[randomVisitable], false);
       }
-      else {
+      else if (visitables[randomVisitable] == stack.back().Down()) {
         w->SetSouth(stack.back(), false);
-
-        w->SetNorth(visitables[randomVisitable], false);
       }
 
       stack.push_back(visitables[randomVisitable]);
