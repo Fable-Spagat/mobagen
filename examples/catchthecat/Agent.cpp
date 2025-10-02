@@ -18,8 +18,17 @@ std::vector<Point2D> Agent::generatePath(World* w) {
 
   while (!frontier.empty()) {
     // get the current from frontier
+    Point2D currentPos = frontier.front();
+
+    if (checkEdge(w, currentPos)) { //make work with hexes
+      break;
+    }
     // remove the current from frontierset
+    frontierSet.erase(currentPos);
+
     // mark current as visited
+    visited[currentPos] = true;
+
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
     // iterate over the neighs:
     // for every neighbor set the cameFrom
@@ -31,4 +40,15 @@ std::vector<Point2D> Agent::generatePath(World* w) {
   // if there isnt a reachable border, just return empty vector
   // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
   return vector<Point2D>();
+}
+
+bool Agent::checkEdge(World* w, Point2D currentPos) {
+  if (abs(currentPos.x) == w->getWorldSideSize() || abs(currentPos.y) == w->getWorldSideSize()) {
+    return true;
+  }
+  return false;
+}
+
+int Agent::manhattanDistance(Point2D& cat, int sideSizeOver2) {
+  return std::min(sideSizeOver2 - abs(cat.x), sideSizeOver2 - abs(cat.y));
 }
