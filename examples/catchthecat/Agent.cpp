@@ -27,7 +27,7 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     frontierSet.erase(currentPos);
 
     // mark current as visited
-    visited[currentPos] = true;
+    visited.at(currentPos) = true;
 
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
     // iterate over the neighs:
@@ -49,6 +49,33 @@ bool Agent::checkEdge(World* w, Point2D currentPos) {
   return false;
 }
 
-int Agent::manhattanDistance(Point2D& cat, int sideSizeOver2) {
+int Agent::heuristic(Point2D& cat, int sideSizeOver2) {
   return std::min(sideSizeOver2 - abs(cat.x), sideSizeOver2 - abs(cat.y));
+}
+
+std::vector<Point2D> Agent::getVisitables(World* w, unordered_map<Point2D, bool>& visited, Point2D currentPos) {
+  std::vector<Point2D> visitables;
+
+  for (int x = -1; x <= 1; x++) {
+    for (int y = -1; y <= 1; y++) {
+      Point2D temp = {currentPos.x + x, currentPos.y + y};
+
+      if (currentPos.y % 2 == 0) {
+        temp.x += 1;
+      }
+
+      if (!w->catCanMoveToPosition(temp)) { continue; }
+
+      if (visited.at(temp)) { continue; }
+
+      if (y != 0) {
+        if (temp.x == 0 || temp.x == 1) {}
+        else { continue; }
+      }
+
+      visitables.push_back(temp);
+    }
+  }
+
+  return visitables;
 }

@@ -13,7 +13,8 @@ public:
 
   std::vector<Point2D> generatePath(World* w);
   bool checkEdge(World* w, Point2D currentPos);
-  int manhattanDistance(Point2D& cat, int sideSizeOver2);//must handle hexes. Find % 2 of size
+  int heuristic(Point2D& cat, int sideSizeOver2);//must handle hexes. Find % 2 of size
+  std::vector<Point2D> getVisitables(World* w, Point2D currentPos);
 };
 
 #endif  // AGENT_H
