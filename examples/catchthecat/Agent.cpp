@@ -59,19 +59,17 @@ std::vector<Point2D> Agent::getVisitables(World* w, unordered_map<Point2D, bool>
   for (int x = -1; x <= 1; x++) {
     for (int y = -1; y <= 1; y++) {
       Point2D temp = {currentPos.x + x, currentPos.y + y};
+      int tempX = x;
 
       if (currentPos.y % 2 == 0) {
-        temp.x += 1;
+        tempX += 1;
       }
 
       if (!w->catCanMoveToPosition(temp)) { continue; }
 
       if (visited.at(temp)) { continue; }
 
-      if (y != 0) {
-        if (temp.x == 0 || temp.x == 1) {}
-        else { continue; }
-      }
+      if (y != 0 && tempX != 2) { continue; }
 
       visitables.push_back(temp);
     }
