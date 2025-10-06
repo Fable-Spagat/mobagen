@@ -30,10 +30,18 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     visited.at(currentPos) = true;
 
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
+    vector<Point2D> neighbors = getVisitables(w, frontierSet, visited, currentPos);
     // iterate over the neighs:
     // for every neighbor set the cameFrom
     // enqueue the neighbors to frontier and frontierset
     // do this up to find a visitable border and break the loop
+    for (int i = 0; i < neighbors.size(); i++) {
+      cameFrom.insert({neighbors[i], currentPos});
+      frontier.push(neighbors[i]);
+      frontierSet.insert(neighbors[i]);
+
+
+    }
   }
 
   // if the border is not infinity, build the path from border to the cat using the camefrom map
@@ -53,11 +61,13 @@ int Agent::heuristic(Point2D& cat, int sideSizeOver2) {
   return std::min(sideSizeOver2 - abs(cat.x), sideSizeOver2 - abs(cat.y));
 }
 
-std::vector<Point2D> Agent::getVisitables(World* w, unordered_map<Point2D, bool>& visited, Point2D currentPos) {
+std::vector<Point2D> Agent::getVisitables(World* w, unordered_set<Point2D>& queue, unordered_map<Point2D, bool>& visited, Point2D currentPos) {
   std::vector<Point2D> visitables;
 
   for (int x = -1; x <= 1; x++) {
     for (int y = -1; y <= 1; y++) {
+      if (x == 0 && y == 0) { continue; }
+
       Point2D temp = {currentPos.x + x, currentPos.y + y};
       int tempX = x;
 
@@ -67,9 +77,14 @@ std::vector<Point2D> Agent::getVisitables(World* w, unordered_map<Point2D, bool>
 
       if (!w->catCanMoveToPosition(temp)) { continue; }
 
+      if (queue.contains(temp)) { continue; }
+
       if (visited.at(temp)) { continue; }
 
-      if (y != 0 && tempX != 2) { continue; }
+      if (y != 0) {
+        if (tempX == 0 || tempX == 1) {}
+        else { continue; }
+      }
 
       visitables.push_back(temp);
     }
