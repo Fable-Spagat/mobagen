@@ -33,3 +33,19 @@ Point2D& Point2D::operator-=(const Point2D& rhs) {
   this->y -= rhs.y;
   return *this;
 }
+
+bool Point2DPrioritized::operator==(const Point2DPrioritized& rhs) const {
+  return x == rhs.x && y == rhs.y;
+}
+
+bool Point2DPrioritized::operator<(const Point2DPrioritized& rhs) const {
+  return priority < rhs.priority;
+}
+
+Point2DPrioritized& Point2DPrioritized::SetPoint2DPrioritized(const Point2D& rhs) {
+  x = rhs.x;
+  y = rhs.y;
+  priority = 0;
+
+  return *this;
+}

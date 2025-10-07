@@ -40,4 +40,33 @@ namespace std {
   };
 }  // namespace std
 
+struct Point2DPrioritized {
+public:
+  Point2DPrioritized(int x, int y) : x(x), y(y){};
+  Point2DPrioritized() = default;
+  int x, y;
+  int priority;
+
+  bool operator==(const Point2DPrioritized& rhs) const;
+  bool operator<(const Point2DPrioritized& rhs) const;
+  Point2DPrioritized& SetPoint2DPrioritized(const Point2D& rhs);
+
+  inline Point2DPrioritized Up() const { return *this + UP; };
+  inline Point2DPrioritized Left() const { return *this + LEFT; };
+  inline Point2DPrioritized Right() const { return *this + RIGHT; };
+  inline Point2DPrioritized Down() const { return *this + DOWN; };
+
+  const static Point2D UP;
+  const static Point2D DOWN;
+  const static Point2D LEFT;
+  const static Point2D RIGHT;
+  const static Point2D INFINITE;
+  std::string to_string();
+
+  // for unordered set
+  size_t operator()(const Point2D& p) const noexcept { return ((uint64_t)p.x) << 32 | (uint64_t)p.y; };
+
+  uint64_t hash(Point2D const& p) const noexcept { return ((uint64_t)p.x) << 32 | (uint64_t)p.y; }
+};
+
 #endif  // POINT2D_H

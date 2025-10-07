@@ -6,19 +6,24 @@
 using namespace std;
 std::vector<Point2D> Agent::generatePath(World* w) {
   unordered_map<Point2D, Point2D> cameFrom;  // to build the flowfield and build the path
-  queue<Point2D> frontier;                   // to store next ones to visit
+  priority_queue<Point2DPrioritized> frontier;                   // to store next ones to visit
   unordered_set<Point2D> frontierSet;        // OPTIMIZATION to check faster if a point is in the queue
   unordered_map<Point2D, bool> visited;      // use .at() to get data, if the element dont exist [] will give you wrong results
+  vector<Point2D> path;
 
   // bootstrap state
   auto catPos = w->getCat();
-  frontier.push(catPos);
+  Point2DPrioritized catPrioritized;
+  catPrioritized.SetPoint2DPrioritized(catPos);
+
+  frontier.push(catPrioritized);
   frontierSet.insert(catPos);
   Point2D borderExit = Point2D::INFINITE;  // if at the end of the loop we dont find a border, we have to return random points
 
   while (!frontier.empty()) {
     // get the current from frontier
-    Point2D currentPos = frontier.front();
+    Point2DPrioritized currentPosPrioritized = frontier.top();
+    Point2D currentPos = Point2D(currentPosPrioritized.x, currentPosPrioritized.y);
 
     if (checkEdge(w, currentPos)) { //make work with hexes
       break;
@@ -36,18 +41,21 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     // enqueue the neighbors to frontier and frontierset
     // do this up to find a visitable border and break the loop
     for (int i = 0; i < neighbors.size(); i++) {
+      Point2DPrioritized neighborPrioritized;
+      neighborPrioritized.SetPoint2DPrioritized(neighbors[i]);
+      neighborPrioritized.priority += currentPosPrioritized.priority;
+      neighborPrioritized.priority += heuristic(catPos, w->getWorldSideSize()/2);
+
       cameFrom.insert({neighbors[i], currentPos});
-      frontier.push(neighbors[i]);
+      frontier.push(neighborPrioritized);
       frontierSet.insert(neighbors[i]);
-
-
     }
   }
 
   // if the border is not infinity, build the path from border to the cat using the camefrom map
   // if there isnt a reachable border, just return empty vector
   // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
-  return vector<Point2D>();
+  return path;
 }
 
 bool Agent::checkEdge(World* w, Point2D currentPos) {
