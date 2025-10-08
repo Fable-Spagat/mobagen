@@ -50,17 +50,6 @@ public:
   bool operator==(const Point2DPrioritized& rhs) const;
   bool operator<(const Point2DPrioritized& rhs) const;
   Point2DPrioritized& SetPoint2DPrioritized(const Point2D& rhs);
-
-  inline Point2DPrioritized Up() const { return *this + UP; };
-  inline Point2DPrioritized Left() const { return *this + LEFT; };
-  inline Point2DPrioritized Right() const { return *this + RIGHT; };
-  inline Point2DPrioritized Down() const { return *this + DOWN; };
-
-  const static Point2D UP;
-  const static Point2D DOWN;
-  const static Point2D LEFT;
-  const static Point2D RIGHT;
-  const static Point2D INFINITE;
   std::string to_string();
 
   // for unordered set

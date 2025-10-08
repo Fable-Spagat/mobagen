@@ -24,15 +24,24 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     // get the current from frontier
     Point2DPrioritized currentPosPrioritized = frontier.top();
     Point2D currentPos = Point2D(currentPosPrioritized.x, currentPosPrioritized.y);
+    frontier.pop();
 
-    if (checkEdge(w, currentPos)) { //make work with hexes
-      break;
+    if (borderExit != Point2D::INFINITE) {
+      path.push_back(borderExit);
+
+      while (path.back() != catPos) {
+        path.push_back(cameFrom[path.back()]);
+      }
+
+      path.pop_back();
+
+      return path;
     }
     // remove the current from frontierset
     frontierSet.erase(currentPos);
 
     // mark current as visited
-    visited.at(currentPos) = true;
+    visited[currentPos] = true;
 
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
     vector<Point2D> neighbors = getVisitables(w, frontierSet, visited, currentPos);
@@ -49,13 +58,18 @@ std::vector<Point2D> Agent::generatePath(World* w) {
       cameFrom.insert({neighbors[i], currentPos});
       frontier.push(neighborPrioritized);
       frontierSet.insert(neighbors[i]);
+
+      if (w->catWinsOnSpace(neighbors[i])) {
+        borderExit = neighbors[i];
+        break;
+      }
     }
   }
 
   // if the border is not infinity, build the path from border to the cat using the camefrom map
   // if there isnt a reachable border, just return empty vector
   // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
-  return path;
+  return vector<Point2D>();
 }
 
 bool Agent::checkEdge(World* w, Point2D currentPos) {
@@ -69,7 +83,7 @@ int Agent::heuristic(Point2D& cat, int sideSizeOver2) {
   return std::min(sideSizeOver2 - abs(cat.x), sideSizeOver2 - abs(cat.y));
 }
 
-std::vector<Point2D> Agent::getVisitables(World* w, unordered_set<Point2D>& queue, unordered_map<Point2D, bool>& visited, Point2D currentPos) {
+std::vector<Point2D> Agent::getVisitables(World* w, std::unordered_set<Point2D> queue, std::unordered_map<Point2D, bool>& visited, Point2D currentPos) {
   std::vector<Point2D> visitables;
 
   for (int x = -1; x <= 1; x++) {
@@ -83,11 +97,13 @@ std::vector<Point2D> Agent::getVisitables(World* w, unordered_set<Point2D>& queu
         tempX += 1;
       }
 
-      if (!w->catCanMoveToPosition(temp)) { continue; }
+      if (!w->catcherCanMoveToPosition(temp)) { continue; }
+
+      if (w->getContent(temp)) { continue; }
 
       if (queue.contains(temp)) { continue; }
 
-      if (visited.at(temp)) { continue; }
+      if (visited[temp]) { continue; }
 
       if (y != 0) {
         if (tempX == 0 || tempX == 1) {}
