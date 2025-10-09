@@ -10,6 +10,7 @@ std::vector<Point2D> Agent::generatePath(World* w) {
   unordered_set<Point2D> frontierSet;        // OPTIMIZATION to check faster if a point is in the queue
   unordered_map<Point2D, bool> visited;      // use .at() to get data, if the element dont exist [] will give you wrong results
   vector<Point2D> path;
+  unordered_map<Point2D, int> costs;
 
   // bootstrap state
   auto catPos = w->getCat();
@@ -50,10 +51,15 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     // enqueue the neighbors to frontier and frontierset
     // do this up to find a visitable border and break the loop
     for (int i = 0; i < neighbors.size(); i++) {
+      int newCost = costs[currentPos] + 1;
       Point2DPrioritized neighborPrioritized;
       neighborPrioritized.SetPoint2DPrioritized(neighbors[i]);
-      neighborPrioritized.priority += currentPosPrioritized.priority;
-      neighborPrioritized.priority += heuristic(catPos, w->getWorldSideSize()/2);
+
+      if (visited[neighbors[i]] || newCost < costs[neighbors[i]]) {
+        neighborPrioritized.priority += currentPosPrioritized.priority;
+        neighborPrioritized.priority += heuristic(neighbors[i], w->getWorldSideSize());
+        costs[neighbors[i]] = neighborPrioritized.priority;
+      }
 
       cameFrom.insert({neighbors[i], currentPos});
       frontier.push(neighborPrioritized);
@@ -79,8 +85,8 @@ bool Agent::checkEdge(World* w, Point2D currentPos) {
   return false;
 }
 
-int Agent::heuristic(Point2D& cat, int sideSizeOver2) {
-  return std::min(sideSizeOver2 - abs(cat.x), sideSizeOver2 - abs(cat.y));
+int Agent::heuristic(Point2D& hex, int sideSize) {
+  return (sideSize/2) - max(abs(hex.x), abs(hex.y));
 }
 
 std::vector<Point2D> Agent::getVisitables(World* w, std::unordered_set<Point2D> queue, std::unordered_map<Point2D, bool>& visited, Point2D currentPos) {
